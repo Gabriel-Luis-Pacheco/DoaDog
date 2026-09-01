@@ -1,0 +1,74 @@
+{
+  "brand": {
+    "logo": "assets/logo/logo-doadog.png",
+    "description": "DoaDog premium mobile design tokens"
+  },
+  "color": {
+    "light": {
+      "background.canvas": "#FFF7EC",
+      "surface.default": "#FFFFFF",
+      "surface.subtle": "#F8F2E9",
+      "surface.muted": "#F1E9DE",
+      "text.primary": "#2B2B2B",
+      "text.secondary": "#5F5750",
+      "text.tertiary": "#8A817A",
+      "border.default": "#E6DCCD",
+      "brand.primary": "#2A9D8F",
+      "brand.primarySoft": "#E1F4F1",
+      "accent.primary": "#F4A261",
+      "accent.primarySoft": "#FFF0E4",
+      "status.danger": "#E76F51",
+      "status.dangerSoft": "#FDE9E5",
+      "focus.ring": "#13786D"
+    },
+    "dark": {
+      "background.canvas": "#0F1716",
+      "surface.default": "#162220",
+      "surface.subtle": "#1C2B28",
+      "surface.muted": "#243633",
+      "text.primary": "#F7F3EE",
+      "text.secondary": "#D8D0C7",
+      "text.tertiary": "#AAA297",
+      "border.default": "#2E423F",
+      "brand.primary": "#2A9D8F",
+      "brand.primarySoft": "#17312E",
+      "accent.primary": "#F4A261",
+      "accent.primarySoft": "#3A2A1A",
+      "status.danger": "#E76F51",
+      "status.dangerSoft": "#3A201B",
+      "focus.ring": "#6FE5D6"
+    }
+  },
+  "spacing": {
+    "xs": 4,
+    "sm": 8,
+    "md": 12,
+    "lg": 16,
+    "xl": 24,
+    "2xl": 32,
+    "3xl": 48,
+    "4xl": 64
+  },
+  "radius": {
+    "xs": 8,
+    "sm": 12,
+    "md": 16,
+    "lg": 20,
+    "xl": 24,
+    "pill": 999
+  },
+  "typography": {
+    "H1": { "fontSize": 34, "lineHeight": 40, "fontWeight": 800 },
+    "H2": { "fontSize": 28, "lineHeight": 34, "fontWeight": 800 },
+    "H3": { "fontSize": 22, "lineHeight": 28, "fontWeight": 700 },
+    "Body": { "fontSize": 16, "lineHeight": 24, "fontWeight": 400 },
+    "BodyStrong": { "fontSize": 16, "lineHeight": 24, "fontWeight": 600 },
+    "Label": { "fontSize": 14, "lineHeight": 18, "fontWeight": 700 },
+    "Caption": { "fontSize": 12, "lineHeight": 16, "fontWeight": 500 }
+  },
+  "shadow": {
+    "sm": "0 3 10 rgba(43, 43, 43, 0.06)",
+    "md": "0 8 18 rgba(43, 43, 43, 0.08)",
+    "lg": "0 16 30 rgba(43, 43, 43, 0.10)"
+  }
+}

@@ -1,0 +1,346 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  USER
+  PROTECTOR
+  ONG
+  PARTNER
+  ADMIN
+}
+
+enum DogSize {
+  SMALL
+  MEDIUM
+  LARGE
+  UNKNOWN
+}
+
+enum DogGender {
+  MALE
+  FEMALE
+  UNKNOWN
+}
+
+enum DogAgeRange {
+  PUPPY
+  YOUNG
+  ADULT
+  SENIOR
+  UNKNOWN
+}
+
+enum DogStatus {
+  AVAILABLE
+  UNDER_ANALYSIS
+  ADOPTED
+}
+
+enum ModerationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum UrgencyLevel {
+  LOW
+  MEDIUM
+  HIGH
+  EMERGENCY
+}
+
+enum AdoptionRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum DonationCampaignStatus {
+  PENDING
+  ACTIVE
+  REJECTED
+  FINISHED
+  CANCELLED
+}
+
+enum DonationStatus {
+  PENDING
+  PAID
+  FAILED
+  CANCELLED
+  EXPIRED
+}
+
+enum PaymentProviderName {
+  MOCK
+  ABACATEPAY
+}
+
+enum HelpType {
+  FOOD
+  TREATMENT
+  MEDICINE
+  TRANSPORT
+  TEMPORARY_HOME
+  OTHER
+}
+
+enum BeneficiaryType {
+  DOG
+  ONG
+  PROTECTOR
+}
+
+enum PartnerStatus {
+  ACTIVE
+  INACTIVE
+}
+
+model User {
+  id                String             @id @default(uuid()) @db.Uuid
+  name              String             @db.VarChar(120)
+  email             String             @unique @db.VarChar(180)
+  passwordHash      String             @map("password_hash")
+  role              UserRole           @default(USER)
+  profile           UserProfile?
+  dogs              Dog[]
+  adoptionRequests  AdoptionRequest[]  @relation("RequesterAdoptionRequests")
+  donationCampaigns DonationCampaign[]
+  donations         Donation[]
+  partners          Partner[]
+  adminActions      AdminAction[]
+  createdAt         DateTime           @default(now()) @map("created_at")
+  updatedAt         DateTime           @updatedAt @map("updated_at")
+
+  @@index([email])
+  @@map("users")
+}
+
+model UserProfile {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @unique @map("user_id") @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  phone     String?  @db.VarChar(40)
+  city      String?  @db.VarChar(120)
+  state     String?  @db.VarChar(2)
+  avatarUrl String?  @map("avatar_url") @db.Text
+  bio       String?  @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([city])
+  @@index([state])
+  @@map("user_profiles")
+}
+
+model Dog {
+  id               String             @id @default(uuid()) @db.Uuid
+  name             String             @db.VarChar(120)
+  description      String             @db.Text
+  age              Int?
+  ageRange         DogAgeRange        @default(UNKNOWN) @map("age_range")
+  size             DogSize            @default(UNKNOWN)
+  gender           DogGender          @default(UNKNOWN)
+  city             String             @db.VarChar(120)
+  state            String             @db.VarChar(2)
+  address          String?            @db.VarChar(180)
+  imageUrl         String?            @map("image_url") @db.Text
+  healthCondition  String?            @map("health_condition") @db.Text
+  vaccinated       Boolean?
+  neutered         Boolean?
+  specialNeeds     String?            @map("special_needs") @db.Text
+  contactName      String?            @map("contact_name") @db.VarChar(120)
+  contactInfo      String?            @map("contact_info") @db.VarChar(180)
+  status           DogStatus          @default(AVAILABLE)
+  moderationStatus ModerationStatus   @default(PENDING) @map("moderation_status")
+  rejectionReason  String?            @map("rejection_reason") @db.Text
+  urgencyLevel     UrgencyLevel       @default(MEDIUM) @map("urgency_level")
+  createdById      String             @map("created_by_id") @db.Uuid
+  createdBy        User               @relation(fields: [createdById], references: [id], onDelete: Restrict)
+  images           DogImage[]
+  adoptionRequests AdoptionRequest[]
+  campaigns        DonationCampaign[]
+  adoptedAt        DateTime?          @map("adopted_at")
+  deletedAt        DateTime?          @map("deleted_at")
+  createdAt        DateTime           @default(now()) @map("created_at")
+  updatedAt        DateTime           @updatedAt @map("updated_at")
+
+  @@index([status])
+  @@index([moderationStatus])
+  @@index([city])
+  @@index([state])
+  @@index([size])
+  @@index([gender])
+  @@index([ageRange])
+  @@index([createdById])
+  @@index([deletedAt])
+  @@map("dogs")
+}
+
+model DogImage {
+  id         String   @id @default(uuid()) @db.Uuid
+  dogId      String   @map("dog_id") @db.Uuid
+  dog        Dog      @relation(fields: [dogId], references: [id], onDelete: Cascade)
+  url        String   @db.Text
+  storageKey String?  @map("storage_key") @db.Text
+  sortOrder  Int      @default(0) @map("sort_order")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([dogId])
+  @@map("dog_images")
+}
+
+model AdoptionRequest {
+  id                      String                @id @default(uuid()) @db.Uuid
+  dogId                   String                @map("dog_id") @db.Uuid
+  dog                     Dog                   @relation(fields: [dogId], references: [id], onDelete: Restrict)
+  requesterId             String                @map("requester_id") @db.Uuid
+  requester               User                  @relation("RequesterAdoptionRequests", fields: [requesterId], references: [id], onDelete: Restrict)
+  message                 String                @db.Text
+  housingType             String                @map("housing_type") @db.VarChar(120)
+  hasYard                 Boolean               @default(false) @map("has_yard")
+  hasOtherPets            Boolean               @default(false) @map("has_other_pets")
+  experience              String                @db.Text
+  routine                 String                @db.Text
+  familyAgreement         Boolean               @default(false) @map("family_agreement")
+  responsibilityAgreement Boolean               @default(false) @map("responsibility_agreement")
+  adopterName             String                @map("adopter_name") @db.VarChar(120)
+  adopterEmail            String                @map("adopter_email") @db.VarChar(180)
+  adopterPhone            String?               @map("adopter_phone") @db.VarChar(40)
+  adopterCity             String?               @map("adopter_city") @db.VarChar(120)
+  adopterState            String?               @map("adopter_state") @db.VarChar(2)
+  status                  AdoptionRequestStatus @default(PENDING)
+  statusNote              String?               @map("status_note") @db.Text
+  createdAt               DateTime              @default(now()) @map("created_at")
+  updatedAt               DateTime              @updatedAt @map("updated_at")
+
+  @@index([dogId])
+  @@index([requesterId])
+  @@index([status])
+  @@map("adoption_requests")
+}
+
+model DonationCampaign {
+  id                     String                 @id @default(uuid()) @db.Uuid
+  title                  String                 @db.VarChar(160)
+  description            String                 @db.Text
+  helpType               HelpType               @default(OTHER) @map("help_type")
+  beneficiaryType        BeneficiaryType        @default(DOG) @map("beneficiary_type")
+  beneficiaryName        String                 @map("beneficiary_name") @db.VarChar(160)
+  city                   String?                @db.VarChar(120)
+  state                  String?                @db.VarChar(2)
+  imageUrl               String?                @map("image_url") @db.Text
+  goalAmountInCents      Int                    @map("goal_amount_in_cents")
+  currentAmountInCents   Int                    @default(0) @map("current_amount_in_cents")
+  suggestedAmountInCents Int?                   @map("suggested_amount_in_cents")
+  urgencyLevel           UrgencyLevel           @default(MEDIUM) @map("urgency_level")
+  status                 DonationCampaignStatus @default(PENDING)
+  rejectionReason        String?                @map("rejection_reason") @db.Text
+  dogId                  String?                @map("dog_id") @db.Uuid
+  dog                    Dog?                   @relation(fields: [dogId], references: [id], onDelete: SetNull)
+  createdById            String                 @map("created_by_id") @db.Uuid
+  createdBy              User                   @relation(fields: [createdById], references: [id], onDelete: Restrict)
+  donations              Donation[]
+  deletedAt              DateTime?              @map("deleted_at")
+  createdAt              DateTime               @default(now()) @map("created_at")
+  updatedAt              DateTime               @updatedAt @map("updated_at")
+
+  @@index([status])
+  @@index([dogId])
+  @@index([createdById])
+  @@index([city])
+  @@index([state])
+  @@index([urgencyLevel])
+  @@index([deletedAt])
+  @@map("donation_campaigns")
+}
+
+model Donation {
+  id                String              @id @default(uuid()) @db.Uuid
+  campaignId        String              @map("campaign_id") @db.Uuid
+  campaign          DonationCampaign    @relation(fields: [campaignId], references: [id], onDelete: Restrict)
+  donorUserId       String?             @map("donor_user_id") @db.Uuid
+  donorUser         User?               @relation(fields: [donorUserId], references: [id], onDelete: SetNull)
+  donorName         String              @map("donor_name") @db.VarChar(120)
+  donorEmail        String              @map("donor_email") @db.VarChar(180)
+  amountInCents     Int                 @map("amount_in_cents")
+  status            DonationStatus      @default(PENDING)
+  externalPaymentId String?             @unique @map("external_payment_id") @db.VarChar(160)
+  paymentProvider   PaymentProviderName @map("payment_provider")
+  brCode            String?             @map("br_code") @db.Text
+  brCodeBase64      String?             @map("br_code_base64") @db.Text
+  expiresAt         DateTime?           @map("expires_at")
+  paidAt            DateTime?           @map("paid_at")
+  createdAt         DateTime            @default(now()) @map("created_at")
+  updatedAt         DateTime            @updatedAt @map("updated_at")
+
+  @@index([campaignId])
+  @@index([donorUserId])
+  @@index([status])
+  @@index([externalPaymentId])
+  @@map("donations")
+}
+
+model PaymentEvent {
+  id                String              @id @default(uuid()) @db.Uuid
+  provider          PaymentProviderName
+  eventId           String?             @unique @map("event_id") @db.VarChar(160)
+  externalPaymentId String?             @map("external_payment_id") @db.VarChar(160)
+  type              String              @db.VarChar(120)
+  payload           Json
+  processedAt       DateTime?           @map("processed_at")
+  createdAt         DateTime            @default(now()) @map("created_at")
+
+  @@index([eventId])
+  @@index([externalPaymentId])
+  @@map("payment_events")
+}
+
+model Partner {
+  id           String        @id @default(uuid()) @db.Uuid
+  name         String        @db.VarChar(160)
+  category     String        @db.VarChar(120)
+  city         String        @db.VarChar(120)
+  state        String        @db.VarChar(2)
+  description  String        @db.Text
+  contactUrl   String?       @map("contact_url") @db.Text
+  contactEmail String?       @map("contact_email") @db.VarChar(180)
+  contactPhone String?       @map("contact_phone") @db.VarChar(40)
+  socialUrl    String?       @map("social_url") @db.Text
+  status       PartnerStatus @default(ACTIVE)
+  createdById  String?       @map("created_by_id") @db.Uuid
+  createdBy    User?         @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  deletedAt    DateTime?     @map("deleted_at")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+
+  @@index([status])
+  @@index([city])
+  @@index([state])
+  @@index([createdById])
+  @@index([deletedAt])
+  @@map("partners")
+}
+
+model AdminAction {
+  id         String   @id @default(uuid()) @db.Uuid
+  adminId    String   @map("admin_id") @db.Uuid
+  admin      User     @relation(fields: [adminId], references: [id], onDelete: Restrict)
+  action     String   @db.VarChar(120)
+  entityType String   @map("entity_type") @db.VarChar(120)
+  entityId   String   @map("entity_id") @db.VarChar(160)
+  reason     String?  @db.Text
+  metadata   Json?
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([adminId])
+  @@index([entityType, entityId])
+  @@map("admin_actions")
+}

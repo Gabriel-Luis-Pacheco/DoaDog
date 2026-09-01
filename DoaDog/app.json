@@ -1,0 +1,59 @@
+{
+  "expo": {
+    "name": "DoaDog",
+    "slug": "doadog",
+    "scheme": "doadog",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/logo/logo-doadog.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/logo/logo-doadog.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FFF7EC"
+    },
+    "ios": {
+      "bundleIdentifier": "com.doadog.app",
+      "buildNumber": "1",
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "O DoaDog usa sua galeria apenas para anexar fotos reais aos cadastros de cães.",
+        "NSLocationWhenInUseUsageDescription": "O DoaDog usa sua localização enquanto o app está aberto para centralizar o mapa em casos próximos."
+      }
+    },
+    "android": {
+      "package": "com.doadog.app",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/logo/logo-doadog.png",
+        "backgroundColor": "#FFF7EC"
+      },
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/logo/logo-doadog.png"
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "O DoaDog usa sua galeria apenas para anexar fotos reais aos cadastros de cães.",
+          "microphonePermission": false
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "O DoaDog usa sua localização enquanto o app está aberto para centralizar o mapa em casos próximos.",
+          "isIosBackgroundLocationEnabled": false,
+          "isAndroidBackgroundLocationEnabled": false,
+          "isAndroidForegroundServiceEnabled": false
+        }
+      ],
+      "expo-secure-store"
+    ]
+  }
+}
